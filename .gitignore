@@ -5,3 +5,4 @@ font.png
 game.sln
 build.rdi
 build.pdb
+*.rdi
