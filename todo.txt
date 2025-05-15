@@ -1,10 +1,20 @@
 CHANGELOG
 
---- 15th May 2025
-init
+--- v0.1
++init
+
+--- v0.2
++fixed subfolders not being created in build
 
 
 --- TODO :next
+
+
+small example game thingo
+
+hot reload
+
+
 
 sound with fmod
 
