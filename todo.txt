@@ -5,23 +5,14 @@ CHANGELOG
 
 --- v0.2
 +fixed subfolders not being created in build
-
++moved logger into utils package
 
 --- TODO :next
-
-
-small example game thingo
-
-hot reload
-
 
 
 sound with fmod
 
 text wrapping
-
-hot reloading of game
-texture hot reload
 
 simple main menu / UI demo
 
