@@ -30,8 +30,6 @@ import slog "external/sokol/log"
 
 import win32 "core:sys/windows"
 
-ATLAS_PNG_DATA :: #load("../atlas.png")
-
 GAME_RES_WIDTH :: 480
 GAME_RES_HEIGHT :: 270
 
