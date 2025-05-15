@@ -1,11 +1,19 @@
-package main
+package logger
+
+//
+// just some logging helpers that make use of the core:log
+//
 
 import "base:runtime"
 import "core:fmt"
 import "core:log"
 import "core:strings"
 
-import win32 "core:sys/windows"
+import win32 "core:sys/windows" // needed for outputting to debug consoles like visual studio or raddbg
+
+logger :: proc() -> log.Logger {
+	return log.Logger{logger_proc, nil, log.Level.Debug, nil}
+}
 
 assertion_failure_proc :: proc(prefix, message: string, loc: runtime.Source_Code_Location) -> ! {
 
@@ -17,7 +25,7 @@ assertion_failure_proc :: proc(prefix, message: string, loc: runtime.Source_Code
 
 	output := strings.to_string(b)
   fmt.print(output)
-	when NOT_RELEASE {
+	when ODIN_DEBUG {
 		win32.OutputDebugStringA(strings.clone_to_cstring(output, allocator=context.temp_allocator))
 	}
 	
@@ -37,7 +45,7 @@ logger_proc :: proc(data: rawptr, level: log.Level, text: string, options: log.O
 	output := strings.to_string(b)
   fmt.print(output)
 
-  when NOT_RELEASE {
+  when ODIN_DEBUG {
 
 		// need this for printing to the debugger
 		win32.OutputDebugStringA(strings.clone_to_cstring(output, allocator=context.temp_allocator))
@@ -50,10 +58,6 @@ logger_proc :: proc(data: rawptr, level: log.Level, text: string, options: log.O
 	if level == .Fatal {
 		runtime.panic(output, loc=location)
 	}
-}
-
-logger :: proc() -> log.Logger {
-	return log.Logger{logger_proc, nil, log.Level.Debug, nil}
 }
 
 

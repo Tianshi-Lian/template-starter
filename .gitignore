@@ -3,3 +3,5 @@ build.exe
 /build
 font.png
 game.sln
+build.rdi
+build.pdb

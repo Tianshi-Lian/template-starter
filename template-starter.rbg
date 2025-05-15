@@ -1,8 +1,15 @@
 // raddbg 0.9.17 project file
 
+recent_file: path: "sauce/build/build.odin"
+recent_file: path: "sauce/utils/utils.odin"
 target:
 {
   executable: "build/windows_debug/game.exe"
+  working_directory: "../template-starter"
+}
+target:
+{
+  executable: "build.exe"
   working_directory: ""
   enabled: 1
 }

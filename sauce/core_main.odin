@@ -13,6 +13,8 @@ Rect :: shape.Rect
 rect_make :: shape.rect_make
 rect_size :: shape.rect_size
 
+import "utils/logger"
+
 import "core:sync"
 import "core:strings"
 import "core:math"
@@ -94,8 +96,8 @@ push_ctx :: proc() -> Core_Context {
 our_context: runtime.Context
 main :: proc() {
 	context = runtime.default_context()
-	context.logger = logger()
-	context.assertion_failure_proc = assertion_failure_proc
+	context.logger = logger.logger()
+	context.assertion_failure_proc = logger.assertion_failure_proc
 	our_context = context
 
 	sapp.run({

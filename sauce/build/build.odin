@@ -22,11 +22,15 @@ import "core:os/os2"
 import "core:os"
 import "core:strings"
 
+import logger "../utils/logger"
 import utils "../utils"
 
 EXE_NAME :: "game"
 
 main :: proc() {
+	context.logger = logger.logger()
+	context.assertion_failure_proc = logger.assertion_failure_proc
+
 	fmt.println(os2.args)
 	
 	// generate the shader
