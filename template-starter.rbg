@@ -1,0 +1,8 @@
+// raddbg 0.9.17 project file
+
+target:
+{
+  executable: "build/windows_debug/game.exe"
+  working_directory: ""
+  enabled: 1
+}

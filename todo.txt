@@ -1,0 +1,18 @@
+CHANGELOG
+
+--- 15th May 2025
+init
+
+
+--- TODO :next
+
+sound with fmod
+
+text wrapping
+
+hot reloading of game
+texture hot reload
+
+simple main menu / UI demo
+
+line drawing
