@@ -5,6 +5,7 @@ package main
 // GAMEPLAY O'CLOCK BAYBEE
 //
 
+import "sound"
 import "utils"
 
 import "core:fmt"
@@ -190,6 +191,8 @@ app_frame :: proc() {
 
 	game_update()
 	game_draw()
+
+	sound.update(get_player().pos, 0.5)
 }
 
 app_shutdown :: proc() {

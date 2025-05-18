@@ -4,6 +4,8 @@ package main
 // main entrypoint
 //
 
+import "sound"
+
 import "utils"
 Pivot :: utils.Pivot
 scale_from_pivot :: utils.scale_from_pivot
@@ -125,6 +127,7 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	assert(s == 0)
 
 	win32.FreeConsole()
+	sound.init()
 
 	_actual_game_state = new(Game_State)
 
