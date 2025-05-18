@@ -21,6 +21,13 @@ is_action_down :: proc(action: Input_Action) -> bool {
 	return .down in ctx.input.keys[key_from_action(action)]
 }
 
+consume_action_pressed :: proc(action: Input_Action) {
+	ctx.input.keys[key_from_action(action)] -= {.pressed}
+}
+consume_action_released :: proc(action: Input_Action) {
+	ctx.input.keys[key_from_action(action)] -= {.released}
+}
+
 key_from_action :: proc(action: Input_Action) -> Key_Code {
 	key, found := action_map[action]
 	if !found {

@@ -7,7 +7,16 @@ CHANGELOG
 +fixed subfolders not being created in build
 +moved logger into utils package
 
+--- v0.3
++input action consume
+
+
 --- TODO :next
+
+
+
+fix ^Entity -> Entity_Handle
+with nice zero entity setup
 
 
 sound with fmod
