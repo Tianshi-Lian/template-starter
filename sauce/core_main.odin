@@ -129,6 +129,8 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	win32.FreeConsole()
 	sound.init()
 
+	entity_init_core()
+
 	_actual_game_state = new(Game_State)
 
 	render_init()

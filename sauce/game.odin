@@ -94,7 +94,7 @@ Game_State :: struct {
 	player_handle: Entity_Handle,
 
 	scratch: struct {
-		all_entities: []^Entity,
+		all_entities: []Entity_Handle,
 	}
 }
 
@@ -216,7 +216,8 @@ game_update :: proc() {
 	rebuild_scratch_helpers()
 	
 	// big :update time
-	for e in get_all_ents() {
+	for handle in get_all_ents() {
+		e := entity_from_handle(handle)
 
 		update_entity_animation(e)
 
@@ -233,10 +234,10 @@ game_update :: proc() {
 rebuild_scratch_helpers :: proc() {
 	// construct the list of all entities on the temp allocator
 	// that way it's easier to loop over later on
-	all_ents := make([dynamic]^Entity, 0, len(ctx.gs.entities), allocator=context.temp_allocator)
+	all_ents := make([dynamic]Entity_Handle, 0, len(ctx.gs.entities), allocator=context.temp_allocator)
 	for &e in ctx.gs.entities {
 		if is_invalid(e) do continue
-		append(&all_ents, &e)
+		append(&all_ents, e.handle)
 	}
 	ctx.gs.scratch.all_entities = all_ents[:]
 }
@@ -264,7 +265,8 @@ game_draw :: proc() {
 
 		draw_text({0, -50}, "sugon", pivot=.bottom_center, col={0,0,0,0.1})
 
-		for e in get_all_ents() {
+		for handle in get_all_ents() {
+			e := entity_from_handle(handle)
 			e.draw_proc(e^)
 		}
 	}

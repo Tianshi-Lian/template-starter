@@ -21,12 +21,17 @@ Entity_Handle :: struct {
 
 zero_entity: Entity // #readonlytodo
 
-get_all_ents :: proc() -> []^Entity {
+get_all_ents :: proc() -> []Entity_Handle {
 	return ctx.gs.scratch.all_entities
 }
 
 is_invalid :: proc(entity: Entity) -> bool {
 	return entity.handle.id == 0
+}
+
+entity_init_core :: proc() {
+	// make sure the zero entity has good defaults, so we don't crash on stuff like functions pointers
+	entity_setup(&zero_entity, .nil)
 }
 
 entity_from_handle :: proc(handle: Entity_Handle) -> (entity: ^Entity, ok:bool) #optional_ok {
