@@ -126,7 +126,10 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	s := utils.seconds_since_init()
 	assert(s == 0)
 
-	win32.FreeConsole()
+	// not currently yeeting the console on start because it's useful for print debugging,
+	// because radbg doesn't have auto-scroll on the output window yet
+	//win32.FreeConsole()
+
 	sound.init()
 
 	entity_init_core()
