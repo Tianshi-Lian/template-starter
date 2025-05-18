@@ -1,25 +1,20 @@
 CHANGELOG
 
 --- v0.1
-+init
+innit
 
 --- v0.2
-+fixed subfolders not being created in build
-+moved logger into utils package
+Fixed subfolders not being created in build
+Moved logger into utils package
 
 --- v0.3
-+input action consume
-
+Change all_entities helper array to use handles instead of pointers.
+Call setup function on zero entity so dummy function pointers can be patched in and not crash.
+Added sound package
+Added input action consume function
 
 --- TODO :next
 
-
-
-fix ^Entity -> Entity_Handle
-with nice zero entity setup
-
-
-sound with fmod
 
 text wrapping
 
