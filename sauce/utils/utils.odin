@@ -135,7 +135,7 @@ crash_when_debug :: proc(args: ..any) {
 
 make_directory_if_not_exist :: proc(path: string) {
 	if !os.exists(path) {
-		err := os2.make_directory_all(path)
+		err := os2.make_directory(path)
 		if err != nil {
 			log.error(err)
 		}
