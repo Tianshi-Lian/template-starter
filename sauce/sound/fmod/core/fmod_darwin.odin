@@ -1,4 +1,3 @@
-#+build windows, darwin
 package fmod_core
 
 // ========================================================================================
@@ -14,12 +13,10 @@ package fmod_core
 
 LOGGING_ENABLED :: #config(FMOD_LOGGING_ENABLED, ODIN_DEBUG)
 
-when ODIN_OS == .Windows {
-    when LOGGING_ENABLED {
-        foreign import lib "lib/windows/x64/fmodL_vc.lib"
-    } else {
-        foreign import lib "lib/windows/x64/fmod_vc.lib"
-    }
+when fmod.LOGGING_ENABLED {
+    foreign import lib "lib/darwin/libfmodL.dylib"
+} else {
+    foreign import lib "lib/darwin/libfmod.dylib"
 }
 
 @(default_calling_convention = "c", link_prefix = "FMOD_")
@@ -80,10 +77,10 @@ foreign lib {
     System_SetOutputByPlugin :: proc(system: ^SYSTEM, handle: u32) -> RESULT ---
     System_GetOutputByPlugin :: proc(system: ^SYSTEM, handle: ^u32) -> RESULT ---
     System_CreateDSPByPlugin :: proc(system: ^SYSTEM, handle: u32, dsp: ^^DSP) -> RESULT ---
-    System_GetDSPInfoByPlugin :: proc(system: ^SYSTEM, handle: u32, description: ^^DSP_DESCRIPTION) -> RESULT ---
-    System_RegisterCodec :: proc(system: ^SYSTEM, description: ^CODEC_DESCRIPTION, handle: ^u32, priority: u32) -> RESULT ---
-    System_RegisterDSP :: proc(system: ^SYSTEM, #by_ptr description: DSP_DESCRIPTION, handle: ^u32) -> RESULT ---
-    System_RegisterOutput :: proc(system: ^SYSTEM, #by_ptr description: OUTPUT_DESCRIPTION, handle: ^u32) -> RESULT ---
+    // System_GetDSPInfoByPlugin :: proc(system: ^SYSTEM, handle: u32, description: ^^DSP_DESCRIPTION) -> RESULT ---
+    // System_RegisterCodec :: proc(system: ^SYSTEM, description: ^CODEC_DESCRIPTION, handle: ^u32, priority: u32) -> RESULT ---
+    // System_RegisterDSP :: proc(system: ^SYSTEM, #by_ptr description: DSP_DESCRIPTION, handle: ^u32) -> RESULT ---
+    // System_RegisterOutput :: proc(system: ^SYSTEM, #by_ptr description: OUTPUT_DESCRIPTION, handle: ^u32) -> RESULT ---
 
     // Init/Close.
     System_Init :: proc(system: ^SYSTEM, maxchannels: i32, flags: INITFLAGS, extradriverdata: rawptr) -> RESULT ---
@@ -117,7 +114,7 @@ foreign lib {
     // Sound/DSP/Channel/FX creation and retrieval.
     System_CreateSound :: proc(system: ^SYSTEM, name_or_data: cstring, mode: MODE, exinfo: ^CREATESOUNDEXINFO, sound: ^^SOUND) -> RESULT ---
     System_CreateStream :: proc(system: ^SYSTEM, name_or_data: cstring, mode: MODE, exinfo: ^CREATESOUNDEXINFO, sound: ^^SOUND) -> RESULT ---
-    System_CreateDSP :: proc(system: ^SYSTEM, #by_ptr description: DSP_DESCRIPTION, dsp: ^^DSP) -> RESULT ---
+    // System_CreateDSP :: proc(system: ^SYSTEM, #by_ptr description: DSP_DESCRIPTION, dsp: ^^DSP) -> RESULT ---
     System_CreateDSPByType :: proc(system: ^SYSTEM, _type: DSP_TYPE, dsp: ^^DSP) -> RESULT ---
     System_CreateChannelGroup :: proc(system: ^SYSTEM, name: cstring, channelgroup: ^^CHANNELGROUP) -> RESULT ---
     System_CreateSoundGroup :: proc(system: ^SYSTEM, name: cstring, soundgroup: ^^SOUNDGROUP) -> RESULT ---
@@ -125,7 +122,7 @@ foreign lib {
     System_PlaySound :: proc(system: ^SYSTEM, sound: ^SOUND, channelgroup: ^CHANNELGROUP, paused: b32, channel: ^^CHANNEL) -> RESULT ---
     System_PlayDSP :: proc(system: ^SYSTEM, dsp: ^DSP, channelgroup: ^CHANNELGROUP, paused: b32, channel: ^^CHANNEL) -> RESULT ---
     System_GetChannel :: proc(system: ^SYSTEM, channelid: i32, channel: ^^CHANNEL) -> RESULT ---
-    System_GetDSPInfoByType :: proc(system: ^SYSTEM, _type: DSP_TYPE, description: ^^DSP_DESCRIPTION) -> RESULT ---
+    // System_GetDSPInfoByType :: proc(system: ^SYSTEM, _type: DSP_TYPE, description: ^^DSP_DESCRIPTION) -> RESULT ---
     System_GetMasterChannelGroup :: proc(system: ^SYSTEM, channelgroup: ^^CHANNELGROUP) -> RESULT ---
     System_GetMasterSoundGroup :: proc(system: ^SYSTEM, soundgroup: ^^SOUNDGROUP) -> RESULT ---
 
@@ -620,7 +617,7 @@ foreign lib {
     DSP_GetParameterb32 :: proc(dsp: ^DSP, index: i32, value: ^b32, valuestr: ^u8, valuestrlen: i32) -> RESULT ---
     DSP_GetParameterData :: proc(dsp: ^DSP, index: i32, data: ^rawptr, length: ^u32, valuestr: ^u8, valuestrlen: i32) -> RESULT ---
     DSP_GetNumParameters :: proc(dsp: ^DSP, numparams: ^i32) -> RESULT ---
-    DSP_GetParameterInfo :: proc(dsp: ^DSP, index: i32, desc: ^^DSP_PARAMETER_DESC) -> RESULT ---
+    // DSP_GetParameterInfo :: proc(dsp: ^DSP, index: i32, desc: ^^DSP_PARAMETER_DESC) -> RESULT ---
     DSP_GetDataParameterIndex :: proc(dsp: ^DSP, datatype: i32, index: ^i32) -> RESULT ---
     DSP_ShowConfigDialog :: proc(dsp: ^DSP, hwnd: rawptr, show: b32) -> RESULT ---
 
@@ -651,7 +648,7 @@ foreign lib {
 
     DSP_SetMeteringEnabled :: proc(dsp: ^DSP, inputEnabled: b32, outputEnabled: b32) -> RESULT ---
     DSP_GetMeteringEnabled :: proc(dsp: ^DSP, inputEnabled: ^b32, outputEnabled: ^b32) -> RESULT ---
-    DSP_GetMeteringInfo :: proc(dsp: ^DSP, inputInfo: ^DSP_METERING_INFO, outputInfo: ^DSP_METERING_INFO) -> RESULT ---
+    // DSP_GetMeteringInfo :: proc(dsp: ^DSP, inputInfo: ^DSP_METERING_INFO, outputInfo: ^DSP_METERING_INFO) -> RESULT ---
     DSP_GetCPUUsage :: proc(dsp: ^DSP, exclusive: ^u32, inclusive: ^u32) -> RESULT ---
 
 
