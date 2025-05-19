@@ -14,9 +14,9 @@ package fmod_studio
 import fmod "../core"
 
 when fmod.LOGGING_ENABLED {
-    foreign import lib "lib/darwin/libfmodL.dylib"
+    foreign import lib "lib/darwin/libfmodstudioL.dylib"
 } else {
-    foreign import lib "lib/darwin/libfmod.dylib"
+    foreign import lib "lib/darwin/libfmodstudio.dylib"
 }
 
 @(default_calling_convention = "c", link_prefix = "FMOD_Studio_")

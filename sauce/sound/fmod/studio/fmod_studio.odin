@@ -20,12 +20,6 @@ when ODIN_OS == .Windows {
     } else {
         foreign import lib "lib/windows/x64/fmodstudio_vc.lib"
     }
-} else when ODIN_OS == .Darwin {
-    when fmod.LOGGING_ENABLED {
-        foreign import lib "lib/darwin/libfmodL.dylib"
-    } else {
-        foreign import lib "lib/darwin/libfmod.dylib"
-    }
 }
 @(default_calling_convention = "c", link_prefix = "FMOD_Studio_")
 foreign lib {
