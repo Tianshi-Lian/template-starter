@@ -17,6 +17,7 @@ it on windows after execution yet.
 #+feature dynamic-literals
 package build
 
+import path "core:path/filepath"
 import "core:fmt"
 import "core:os/os2"
 import "core:os"
@@ -86,21 +87,55 @@ main :: proc() {
 	// docs: https://github.com/floooh/sokol-tools/blob/master/docs/sokol-shdc.md
 	utils.fire("sokol-shdc", "-i", "sauce/shader.glsl", "-o", "sauce/generated_shader.odin", "-l", "hlsl5:metal_macos", "-f", "sokol_odin")
 	
-	out_dir := "build/windows_debug"
+	out_dir : string
+	switch target {
+		case .windows: out_dir = "build/windows_debug"
+		case .mac: out_dir = "build/mac_debug"
+	}
 
 	utils.make_directory_if_not_exist(out_dir)
 
-	c: [dynamic]string = {
-		"odin",
-		"build",
-		"sauce",
-		"-debug",
-		fmt.tprintf("-out:%v/%v.exe", out_dir, EXE_NAME),
+	// build command
+	{
+		c: [dynamic]string = {
+			"odin",
+			"build",
+			"sauce",
+			"-debug",
+			fmt.tprintf("-out:%v/%v.exe", out_dir, EXE_NAME),
+		}
+		// not needed, it's easier to just generate code into generated.odin
+		//append(&c, fmt.tprintf("-define:TARGET_STRING=%v", target))
+		utils.fire(..c[:])
 	}
-	// not needed, it's easier to just generate code into generated.odin
-	//append(&c, fmt.tprintf("-define:TARGET_STRING=%v", target))
 
-	utils.fire(..c[:])
+	// copy stuff into folder
+	{
+		// NOTE, if it already exists, it won't copy (to save build time)
+		files_to_copy: [dynamic]string
+
+		switch target {
+			case .windows:
+			append(&files_to_copy, "sauce/sound/fmod/studio/lib/windows/x64/fmodstudio.dll")
+			append(&files_to_copy, "sauce/sound/fmod/studio/lib/windows/x64/fmodstudioL.dll")
+			append(&files_to_copy, "sauce/sound/fmod/core/lib/windows/x64/fmod.dll")
+			append(&files_to_copy, "sauce/sound/fmod/core/lib/windows/x64/fmodL.dll")
+
+			case .mac:
+			append(&files_to_copy, "sauce/sound/fmod/studio/lib/darwin/libfmodstudio.dylib")
+			append(&files_to_copy, "sauce/sound/fmod/studio/lib/darwin/libfmodstudioL.dylib")
+			append(&files_to_copy, "sauce/sound/fmod/core/lib/darwin/libfmod.dylib")
+			append(&files_to_copy, "sauce/sound/fmod/core/lib/darwin/libfmodL.dylib")
+		}
+
+		for src in files_to_copy {
+			_, file_name := path.split(src)
+			dest := fmt.tprintf("%v/%v", out_dir, file_name)
+			if !os.exists(dest) {
+				os2.copy_file(dest, src)
+			}
+		}
+	}
 
 	fmt.println("DONE in", time.diff(start_time, time.now()))
 }
