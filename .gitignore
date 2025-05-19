@@ -7,3 +7,6 @@ build.rdi
 build.pdb
 *.rdi
 template-starter.rbg
+/asset_workbench/fmod/.user
+/asset_workbench/fmod/.unsaved
+/asset_workbench/fmod/.cache

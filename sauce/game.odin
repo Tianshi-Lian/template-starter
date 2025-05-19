@@ -189,6 +189,8 @@ app_frame :: proc() {
 		draw_text({x, y}, "hello world.", z_layer=.ui, pivot=Pivot.top_left)
 	}
 
+	sound.play_continuously("event:/ambiance", "")
+
 	game_update()
 	game_draw()
 
