@@ -13,7 +13,7 @@ package fmod_core
 
 LOGGING_ENABLED :: #config(FMOD_LOGGING_ENABLED, ODIN_DEBUG)
 
-when fmod.LOGGING_ENABLED {
+when LOGGING_ENABLED {
     foreign import lib "lib/darwin/libfmodL.dylib"
 } else {
     foreign import lib "lib/darwin/libfmod.dylib"
