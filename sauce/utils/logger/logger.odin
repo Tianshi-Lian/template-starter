@@ -9,8 +9,6 @@ import "core:fmt"
 import "core:log"
 import "core:strings"
 
-import win32 "core:sys/windows" // needed for outputting to debug consoles like visual studio or raddbg
-
 logger :: proc() -> log.Logger {
 	return log.Logger{logger_proc, nil, log.Level.Debug, nil}
 }
@@ -25,8 +23,8 @@ assertion_failure_proc :: proc(prefix, message: string, loc: runtime.Source_Code
 
 	output := strings.to_string(b)
   fmt.print(output)
-	when ODIN_DEBUG {
-		win32.OutputDebugStringA(strings.clone_to_cstring(output, allocator=context.temp_allocator))
+	when ODIN_DEBUG && ODIN_OS == .Windows {
+		windows_print_to_debug_console(output)
 	}
 	
 	runtime.trap()
@@ -48,7 +46,9 @@ logger_proc :: proc(data: rawptr, level: log.Level, text: string, options: log.O
   when ODIN_DEBUG {
 
 		// need this for printing to the debugger
-		win32.OutputDebugStringA(strings.clone_to_cstring(output, allocator=context.temp_allocator))
+		when ODIN_OS == .Windows {
+			windows_print_to_debug_console(output)
+		}
 
     if level >= log.Level.Error {
       runtime.trap()

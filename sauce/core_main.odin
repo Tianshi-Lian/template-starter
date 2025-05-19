@@ -37,12 +37,14 @@ import win32 "core:sys/windows"
 GAME_RES_WIDTH :: 480
 GAME_RES_HEIGHT :: 270
 
+// Release or Debug
 GENERATE_DEBUG_SYMBOLS :: ODIN_DEBUG
 RELEASE :: #config(RELEASE, !ODIN_DEBUG) // by default, make it not release on -debug
-NOT_RELEASE :: !RELEASE
+NOT_RELEASE :: !RELEASE // called this NOT_RELEASE because we can still be debuggin on release
+
+// these are used right now, will make them useful later on
 DEMO :: #config(DEMO, false)
 DEV :: #config(DEV, NOT_RELEASE)
-PLATFORM :: #config(PLATFORM, "undefined")
 
 // inital params, these are resized in the event callback
 window_w :i32= 1280
@@ -128,7 +130,9 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 
 	// not currently yeeting the console on start because it's useful for print debugging,
 	// because radbg doesn't have auto-scroll on the output window yet
-	//win32.FreeConsole()
+	when ODIN_OS == .Windows {
+		//win32.FreeConsole()
+	}
 
 	sound.init()
 

@@ -13,6 +13,11 @@ Call setup function on zero entity so dummy function pointers can be patched in 
 Added sound package
 Added input action consume function
 
+--- v0.4
+Platform target in build
+Added mac support
+Added ols.json for better LSP control
+
 --- TODO :next
 
 
