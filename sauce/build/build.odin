@@ -87,7 +87,9 @@ main :: proc() {
 	// docs: https://github.com/floooh/sokol-tools/blob/master/docs/sokol-shdc.md
 	utils.fire("sokol-shdc", "-i", "sauce/shader.glsl", "-o", "sauce/generated_shader.odin", "-l", "hlsl5:metal_macos", "-f", "sokol_odin")
 
-	utils.make_directory_if_not_exist("build")
+	wd := os.get_current_directory()
+
+	//utils.make_directory_if_not_exist("build")
 	
 	out_dir : string
 	switch target {
@@ -95,7 +97,9 @@ main :: proc() {
 		case .mac: out_dir = "build/mac_debug"
 	}
 
-	utils.make_directory_if_not_exist(out_dir)
+	full_out_dir_path := fmt.tprintf("%v/%v", wd, out_dir)
+	log.info(full_out_dir_path)
+	utils.make_directory_if_not_exist(full_out_dir_path)
 
 	// build command
 	{
