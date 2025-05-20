@@ -18,6 +18,10 @@ Platform target in build
 Added mac support
 Added ols.json for better LSP control
 
+--- v0.5
+Empty shape now behaves as expected
+is_valid helper
+
 --- TODO :next
 
 

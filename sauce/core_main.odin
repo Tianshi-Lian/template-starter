@@ -11,7 +11,9 @@ Pivot :: utils.Pivot
 scale_from_pivot :: utils.scale_from_pivot
 
 import shape "utils/shape"
+Shape :: shape.Shape
 Rect :: shape.Rect
+Circle :: shape.Circle
 rect_make :: shape.rect_make
 rect_size :: shape.rect_size
 

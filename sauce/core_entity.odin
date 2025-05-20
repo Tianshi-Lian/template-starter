@@ -25,8 +25,15 @@ get_all_ents :: proc() -> []Entity_Handle {
 	return ctx.gs.scratch.all_entities
 }
 
-is_invalid :: proc(entity: Entity) -> bool {
-	return entity.handle.id == 0
+is_valid :: proc {
+	entity_is_valid,
+	entity_is_valid_ptr,
+}
+entity_is_valid :: proc(entity: Entity) -> bool {
+	return entity.handle.id != 0
+}
+entity_is_valid_ptr :: proc(entity: ^Entity) -> bool {
+	return entity != nil && entity_is_valid(entity^)
 }
 
 entity_init_core :: proc() {

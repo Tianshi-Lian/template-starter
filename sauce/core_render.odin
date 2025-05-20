@@ -763,6 +763,9 @@ draw_rect_xform :: proc(
 	// create a simple AABB rect
 	// and transform it into clipspace, ready for the GPU
 	// see: https://learnopengl.com/img/getting-started/coordinate_systems.png
+	if draw_frame.coord_space == {} {
+		log.error("no coord space set!")
+	}
 	model := xform
 	view := linalg.inverse(draw_frame.coord_space.camera)
 	projection := draw_frame.coord_space.proj

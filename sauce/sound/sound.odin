@@ -165,6 +165,8 @@ play_continuously :: proc(name: string, unique_id: string, pos := INVALID_POS) {
 
 			// update position
 			if pos != INVALID_POS {
+				// #TODO, figure out why this is failing and have it not spam the console
+
 				// this could fail, for fmod reasons...
 				succ := update_pos(emitter.event, pos)
 				if !succ {
