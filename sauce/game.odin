@@ -238,7 +238,7 @@ rebuild_scratch_helpers :: proc() {
 	// that way it's easier to loop over later on
 	all_ents := make([dynamic]Entity_Handle, 0, len(ctx.gs.entities), allocator=context.temp_allocator)
 	for &e in ctx.gs.entities {
-		if is_invalid(e) do continue
+		if !is_valid(e) do continue
 		append(&all_ents, e.handle)
 	}
 	ctx.gs.scratch.all_entities = all_ents[:]

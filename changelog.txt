@@ -22,6 +22,9 @@ Added ols.json for better LSP control
 Empty shape now behaves as expected
 is_valid helper
 
+--- v0.6
+Removed old is_invalid to replace with new is_valid
+
 --- TODO :next
 
 
