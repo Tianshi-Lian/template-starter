@@ -68,7 +68,7 @@ If you're on a budget, here's some free alternatives:
 - I do [live streams](https://www.youtube.com/@randyprime2) of development while using this template
 - My public [Discord community](https://discord.gg/JXhxeQW4ca) (you can ask as many questions in there as you'd like and get help from the community, I just can't guarentee the quality of the answers)
 
-### Why is this a template?
+### Why is this a template (not a library)?
 Game development is complicated.
 
 I think trying to abstract everything away behind a library is a mistake. It makes things look and feel "clean" but sacrifices the capability, limiting what you're able to do and forcing you to use hacky workarounds instead of just doing the simplest and most direct thing possible to solve the problem.
