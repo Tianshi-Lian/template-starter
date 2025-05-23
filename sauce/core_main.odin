@@ -130,10 +130,11 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	s := utils.seconds_since_init()
 	assert(s == 0)
 
-	// not currently yeeting the console on start because it's useful for print debugging,
-	// because radbg doesn't have auto-scroll on the output window yet
+	// flick this on if you want to yeet the debug console on startup
+	// I prefer it right now over the raddbg output because it's faster for print debugging
+	// since it doesn't animate
 	when ODIN_OS == .Windows {
-		//win32.FreeConsole()
+		win32.FreeConsole()
 	}
 
 	sound.init()
