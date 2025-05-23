@@ -25,7 +25,24 @@ is_valid helper
 --- v0.6
 Removed old is_invalid to replace with new is_valid
 
+--- v0.7
+schloop one-shot sound on click example
+Added any_key_press_and_consume
+Added mouse_pos_in_current_space 
+raw_button helper for ui button stuff
+
 --- TODO :next
+
+
+modularize input & render
+only the core main needs to be proj-specific
+that way we can have different main loop structures
+
+
+maybe rethink how the get world space function works?
+we kinda want to hard code a get mouse pos in world space... maybe
+
+
 
 
 text wrapping
