@@ -8,6 +8,7 @@ package main
 import "sound"
 import "utils"
 
+import "core:log"
 import "core:fmt"
 import "core:mem"
 import "core:math"
@@ -194,7 +195,8 @@ app_frame :: proc() {
 	game_update()
 	game_draw()
 
-	sound.update(get_player().pos, 0.5)
+	volume :f32= 0.75
+	sound.update(get_player().pos, volume)
 }
 
 app_shutdown :: proc() {
@@ -208,6 +210,9 @@ game_update :: proc() {
 		ctx.gs.game_time_elapsed += f64(ctx.delta_t)
 		ctx.gs.ticks += 1
 	}
+
+	// this'll be using the last frame's camera position, but it's fine for most things
+	push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
 
 	// setup world for first game tick
 	if ctx.gs.ticks == 0 {
@@ -226,6 +231,14 @@ game_update :: proc() {
 		if e.update_proc != nil {
 			e.update_proc(e)
 		}
+	}
+
+	if key_pressed(.LEFT_MOUSE) {
+		consume_key_pressed(.LEFT_MOUSE)
+
+		pos := mouse_pos_in_current_space()
+		log.info("schloop at", pos)
+		sound.play("event:/schloop", pos=pos)
 	}
 
 	utils.animate_to_target_v2(&ctx.gs.cam_pos, get_player().pos, ctx.delta_t, rate=10)
