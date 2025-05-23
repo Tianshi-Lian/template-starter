@@ -3,6 +3,10 @@ package main
 // #todo, add in the button helpers
 
 import "utils"
+import "utils/shape"
+
+import "core:fmt"
+import "core:log"
 import "core:math"
 import "core:math/linalg"
 
@@ -52,5 +56,15 @@ screen_pivot :: proc(pivot: Pivot) -> (x, y: f32) {
 	x = mouse_world.x
 	y = mouse_world.y
 	
+	return
+}
+
+raw_button :: proc(rect: Rect) -> (hover, pressed: bool) {
+	mouse_pos := mouse_pos_in_current_space()
+	hover = shape.rect_contains(rect, mouse_pos)
+	if hover && key_pressed(.LEFT_MOUSE) {
+		consume_key_pressed(.LEFT_MOUSE)
+		pressed = true
+	}
 	return
 }
