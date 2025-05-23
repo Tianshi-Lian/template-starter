@@ -4,20 +4,22 @@ package main
 // main entrypoint
 //
 
-import "sound"
+import "bald:sound"
 
-import "utils"
+import "bald:utils"
 Pivot :: utils.Pivot
 scale_from_pivot :: utils.scale_from_pivot
 
-import shape "utils/shape"
+import "bald:draw"
+
+import shape "bald:utils/shape"
 Shape :: shape.Shape
 Rect :: shape.Rect
 Circle :: shape.Circle
 rect_make :: shape.rect_make
 rect_size :: shape.rect_size
 
-import "utils/logger"
+import "bald:utils/logger"
 
 import "core:sync"
 import "core:strings"
@@ -29,10 +31,10 @@ import "core:time"
 import "base:runtime"
 import "base:builtin"
 
-import sapp "external/sokol/app"
-import sg "external/sokol/gfx"
-import sglue "external/sokol/glue"
-import slog "external/sokol/log"
+import sapp "bald:sokol/app"
+import sg "bald:sokol/gfx"
+import sglue "bald:sokol/glue"
+import slog "bald:sokol/log"
 
 import win32 "core:sys/windows"
 
@@ -51,8 +53,6 @@ DEV :: #config(DEV, NOT_RELEASE)
 // inital params, these are resized in the event callback
 window_w :i32= 1280
 window_h :i32= 720
-
-clear_col: Vector4
 
 TICKS_PER_SECOND :: 60
 SIM_RATE :: 1.0 / TICKS_PER_SECOND
@@ -143,7 +143,7 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 
 	_actual_game_state = new(Game_State)
 
-	render_init()
+	draw.render_init()
 }
 
 app_ticks: u64
@@ -175,9 +175,9 @@ core_app_frame :: proc "c" () {
 		sapp.toggle_fullscreen()
 	}
 
-	core_render_frame_start()
+	draw.core_render_frame_start()
 	app_frame()
-	core_render_frame_end()
+	draw.core_render_frame_end()
 
 	reset_input_state(ctx.input)
 	free_all(context.temp_allocator)

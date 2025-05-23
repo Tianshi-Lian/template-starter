@@ -9,7 +9,7 @@ package main
 import "core:math/linalg"
 import "core:log"
 
-import sapp "external/sokol/app"
+import sapp "bald:sokol/app"
 
 is_action_pressed :: proc(action: Input_Action) -> bool {
 	return .pressed in ctx.input.keys[key_from_action(action)]

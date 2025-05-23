@@ -2,8 +2,10 @@ package main
 
 // #todo, add in the button helpers
 
-import "utils"
-import "utils/shape"
+import "bald:utils"
+import "bald:utils/shape"
+
+import "bald:draw"
 
 import "core:fmt"
 import "core:log"

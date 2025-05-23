@@ -5,8 +5,13 @@ package main
 // GAMEPLAY O'CLOCK BAYBEE
 //
 
-import "sound"
-import "utils"
+import "bald:draw"
+import "bald:sound"
+import "bald:utils"
+import "bald:utils/color"
+
+import user "user:bald-user"
+Sprite_Name :: user.Sprite_Name
 
 import "core:log"
 import "core:fmt"
@@ -14,7 +19,7 @@ import "core:mem"
 import "core:math"
 import "core:math/linalg"
 
-import sapp "external/sokol/app"
+import sapp "bald:sokol/app"
 import spall "core:prof/spall"
 
 VERSION :string: "v0.0.0"
@@ -99,29 +104,8 @@ Game_State :: struct {
 	}
 }
 
-Sprite_Name :: enum {
-	nil,
-	bald_logo,
-	fmod_logo,
-	player_still,
-	shadow_medium,
-	bg_repeat_tex0,
-	player_death,
-	player_run,
-	player_idle,
-	// to add new sprites, just put the .png in the res/images folder
-	// and add the name to the enum here
-	//
-	// we could auto-gen this based on all the .png's in the images folder
-	// but I don't really see the point right now. It's not hard to type lol.
-}
-get_frame_count :: proc(sprite: Sprite_Name) -> int {
-	#partial switch sprite {
-		case .player_idle: return 2
-		case .player_run: return 3
-	}
-	return 1
-}
+
+
 
 Entity_Kind :: enum {
 	nil,
@@ -142,36 +126,6 @@ entity_setup :: proc(e: ^Entity, kind: Entity_Kind) {
 }
 
 //
-// rendering user-code
-//
-
-const_shader_data_setup :: proc(data: ^Const_Shader_Data) {
-	data.bg_repeat_tex0_atlas_uv = atlas_uv_from_sprite(Sprite_Name.bg_repeat_tex0)
-}
-
-ZLayer :: enum u8 {
-	// Can add as many layers as you want in here.
-	// Quads get sorted and drawn lowest to highest.
-	// When things are on the same layer, they follow normal call order.
-	nil,
-	background,
-	shadow,
-	playspace,
-	vfx,
-	ui,
-	tooltip,
-	pause_menu,
-	top,
-}
-
-Quad_Flags :: enum u8 {
-	// #shared with the shader.glsl definition
-	background_pixels = (1<<0),
-	flag2 = (1<<1),
-	flag3 = (1<<2),
-}
-
-//
 // main game procs
 //
 
@@ -182,12 +136,12 @@ app_frame :: proc() {
 
 	{
 		// ui space example
-		push_coord_space({proj=get_screen_space_proj(), camera=Matrix4(1)})
+		draw.push_coord_space({proj=get_screen_space_proj(), camera=Matrix4(1)})
 
 		x, y := screen_pivot(.top_left)
 		x += 2
 		y -= 2
-		draw_text({x, y}, "hello world.", z_layer=.ui, pivot=Pivot.top_left)
+		draw.draw_text({x, y}, "hello world.", z_layer=.ui, pivot=Pivot.top_left)
 	}
 
 	sound.play_continuously("event:/ambiance", "")
@@ -212,7 +166,7 @@ game_update :: proc() {
 	}
 
 	// this'll be using the last frame's camera position, but it's fine for most things
-	push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
+	draw.push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
 
 	// setup world for first game tick
 	if ctx.gs.ticks == 0 {
@@ -260,25 +214,25 @@ rebuild_scratch_helpers :: proc() {
 game_draw :: proc() {
 
 	// this is so we can get the current pixel in the shader in world space (VERYYY useful)
-	draw_frame.ndc_to_world_xform = get_world_space_camera() * linalg.inverse(get_world_space_proj())
+	draw.draw_frame.ndc_to_world_xform = get_world_space_camera() * linalg.inverse(get_world_space_proj())
 
 	// background thing
 	{
 		// identity matrices, so we're in clip space
-		push_coord_space({proj=Matrix4(1), camera=Matrix4(1)})
+		draw.push_coord_space({proj=Matrix4(1), camera=Matrix4(1)})
 
 		// draw rect that covers the whole screen
-		draw_rect(Rect{ -1, -1, 1, 1}, flags=Quad_Flags.background_pixels) // we leave it in the hands of the shader
+		draw.draw_rect(Rect{ -1, -1, 1, 1}, flags=.background_pixels) // we leave it in the hands of the shader
 	}
 
 	// world
 	{
-		push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
+		draw.push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
 		
-		draw_sprite({10, 10}, .player_still, col_override=v4{1,0,0,0.4})
-		draw_sprite({-10, 10}, .player_still)
+		draw.draw_sprite({10, 10}, .player_still, col_override=v4{1,0,0,0.4})
+		draw.draw_sprite({-10, 10}, .player_still)
 
-		draw_text({0, -50}, "sugon", pivot=.bottom_center, col={0,0,0,0.1})
+		draw.draw_text({0, -50}, "sugon", pivot=.bottom_center, col={0,0,0,0.1})
 
 		for handle in get_all_ents() {
 			e := entity_from_handle(handle)
@@ -294,7 +248,7 @@ draw_entity_default :: proc(e: Entity) {
 		return
 	}
 
-	draw_sprite(e.pos, e.sprite, anim_index=e.anim_index, entity=&e, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=.bottom_center)
+	draw_sprite_entity(&e, e.pos, e.sprite, anim_index=e.anim_index, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=.bottom_center)
 }
 
 //
@@ -341,7 +295,7 @@ setup_player :: proc(e: ^Entity) {
 	}
 
 	e.draw_proc = proc(e: Entity) {
-		draw_sprite(e.pos, .shadow_medium, col={1,1,1,0.2})
+		draw.draw_sprite(e.pos, .shadow_medium, col={1,1,1,0.2})
 		draw_entity_default(e)
 	}
 }
@@ -362,7 +316,7 @@ entity_set_animation :: proc(e: ^Entity, sprite: Sprite_Name, frame_duration: f3
 update_entity_animation :: proc(e: ^Entity) {
 	if e.frame_duration == 0 do return
 
-	frame_count := get_frame_count(e.sprite)
+	frame_count := user.get_frame_count(e.sprite)
 
 	is_playing := true
 	if !e.loop {
@@ -388,4 +342,83 @@ update_entity_animation :: proc(e: ^Entity) {
 			}
 		}
 	}
+}
+
+get_world_space_proj :: proc() -> Matrix4 {
+	return linalg.matrix_ortho3d_f32(f32(window_w) * -0.5, f32(window_w) * 0.5, f32(window_h) * -0.5, f32(window_h) * 0.5, -1, 1)
+}
+get_world_space_camera :: proc() -> Matrix4 {
+	cam := Matrix4(1)
+	cam *= utils.xform_translate(ctx.gs.cam_pos)
+	cam *= utils.xform_scale(get_camera_zoom())
+	return cam
+}
+
+get_screen_space_proj :: proc() -> Matrix4 {
+	scale := f32(GAME_RES_HEIGHT) / f32(window_h) // same res as standard world zoom
+	
+	w := f32(window_w) * scale
+	h := f32(window_h) * scale
+	
+	// this centers things
+	offset := GAME_RES_WIDTH*0.5 - w*0.5
+
+	return linalg.matrix_ortho3d_f32(0+offset, w+offset, 0, h, -1, 1)
+}
+
+get_camera_zoom :: proc() -> f32 {
+	return f32(GAME_RES_HEIGHT) / f32(window_h)
+}
+
+// this is reliant on the ctx input mouse pos
+mouse_pos_in_current_space :: proc() -> Vec2 {
+	proj := draw.draw_frame.coord_space.proj
+	cam := draw.draw_frame.coord_space.camera
+	if proj == {} || cam == {} {
+		log.error("not in a space, need to push_coord_space first")
+	}
+	
+	mouse := Vec2{ctx.input.mouse_x, ctx.input.mouse_y}
+
+	ndc_x := (mouse.x / (f32(window_w) * 0.5)) - 1.0;
+	ndc_y := (mouse.y / (f32(window_h) * 0.5)) - 1.0;
+	ndc_y *= -1
+	
+	mouse_ndc := v2{ndc_x, ndc_y}
+	
+	mouse_world :Vec4= Vec4{mouse_ndc.x, mouse_ndc.y, 0, 1}
+
+	mouse_world = linalg.inverse(proj) * mouse_world
+	mouse_world = cam * mouse_world
+	
+	return mouse_world.xy
+}
+
+draw_sprite_entity :: proc(
+	entity: ^Entity,
+
+	pos: Vec2,
+	sprite: user.Sprite_Name,
+	pivot:=utils.Pivot.center_center,
+	flip_x:=false,
+	draw_offset:=Vec2{},
+	xform:=Matrix4(1),
+	anim_index:=0,
+	col:=color.WHITE,
+	col_override:Vec4={},
+	z_layer:user.ZLayer={},
+	flags:user.Quad_Flags={},
+	params:Vec4={},
+	crop_top:f32=0.0,
+	crop_left:f32=0.0,
+	crop_bottom:f32=0.0,
+	crop_right:f32=0.0,
+	z_layer_queue:=-1,
+) {
+
+	col_override := col_override
+
+	
+
+	draw.draw_sprite(pos, sprite, pivot, flip_x, draw_offset, xform, anim_index, col, col_override, z_layer, flags, params, crop_top, crop_left, crop_bottom, crop_right)
 }

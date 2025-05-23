@@ -23,10 +23,11 @@ Here's the Holy Bible -> https://thebookofshaders.com/
 
 
 // syntax reference: https://github.com/floooh/sokol-tools/blob/master/docs/sokol-shdc.md
-@header package main
-@header import sg "external/sokol/gfx"
+@header #+private package
+@header package draw
+@header import sg "bald:sokol/gfx"
 
-@ctype vec4 Vector4
+@ctype vec4 Vec4
 @ctype mat4 Matrix4
 
 //

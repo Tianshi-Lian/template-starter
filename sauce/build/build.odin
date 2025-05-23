@@ -26,8 +26,8 @@ import "core:log"
 import "core:reflect"
 import "core:time"
 
-import logger "../utils/logger"
-import utils "../utils"
+import logger "bald:utils/logger"
+import utils "bald:utils"
 
 EXE_NAME :: "game"
 
@@ -85,7 +85,7 @@ main :: proc() {
 	
 	// generate the shader
 	// docs: https://github.com/floooh/sokol-tools/blob/master/docs/sokol-shdc.md
-	utils.fire("sokol-shdc", "-i", "sauce/shader.glsl", "-o", "sauce/generated_shader.odin", "-l", "hlsl5:metal_macos", "-f", "sokol_odin")
+	utils.fire("sokol-shdc", "-i", "sauce/shader.glsl", "-o", "sauce/bald/draw/generated_shader.odin", "-l", "hlsl5:metal_macos", "-f", "sokol_odin")
 
 	wd := os.get_current_directory()
 
@@ -108,6 +108,8 @@ main :: proc() {
 			"build",
 			"sauce",
 			"-debug",
+			"-collection:bald=sauce/bald",
+			"-collection:user=sauce",
 			fmt.tprintf("-out:%v/%v.exe", out_dir, EXE_NAME),
 		}
 		// not needed, it's easier to just generate code into generated.odin
