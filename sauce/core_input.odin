@@ -40,6 +40,20 @@ key_from_action :: proc(action: Input_Action) -> Key_Code {
 // usage examples & helpers
 //
 
+any_key_press_and_consume :: proc() -> bool {
+
+	for &key_flag, key in ctx.input.keys {
+		if key >= int(Key_Code.LEFT_MOUSE) do continue // skip mouse keys
+
+		if .pressed in key_flag {
+			key_flag -= {.pressed} // consume
+			return true
+		}
+	}
+
+	return false
+}
+
 get_input_vector :: proc() -> Vec2 {
 	input: Vec2
 	if is_action_down(.left) do input.x -= 1.0
