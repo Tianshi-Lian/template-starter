@@ -69,7 +69,7 @@ render_init :: proc() {
 	load_sprites_into_atlas()
 	load_font()
 	if const_shader_data_setup != nil {
-		const_shader_data_setup(&const_shader_data)
+		const_shader_data_setup()
 	} else {
 		log.warn("const_shader_data_setup callback not defined, skipping")
 	}
@@ -206,9 +206,9 @@ Draw_Frame :: struct {
 
 }
 draw_frame: Draw_Frame
-const_shader_data: Const_Shader_Data
 
-const_shader_data_setup: proc(data: ^Const_Shader_Data)
+const_shader_data: Const_Shader_Data
+const_shader_data_setup: proc()
 
 
 Sprite :: struct {

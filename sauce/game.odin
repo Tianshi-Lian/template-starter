@@ -129,6 +129,16 @@ entity_setup :: proc(e: ^Entity, kind: Entity_Kind) {
 // main game procs
 //
 
+app_init :: proc() {
+
+	// setup the const data for the shader
+	draw.const_shader_data_setup = proc() {
+		using draw.const_shader_data
+
+		bg_repeat_tex0_atlas_uv = draw.atlas_uv_from_sprite(.bg_repeat_tex0)
+	}
+}
+
 app_frame :: proc() {
 
 	// right now we are just calling the game update, but in future this is where you'd do a big

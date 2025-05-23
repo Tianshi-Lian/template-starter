@@ -144,6 +144,8 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	_actual_game_state = new(Game_State)
 
 	draw.render_init()
+
+	app_init()
 }
 
 app_ticks: u64
