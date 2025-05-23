@@ -68,10 +68,10 @@ render_init :: proc() {
 
 	load_sprites_into_atlas()
 	load_font()
-	if const_shader_data_setup != nil {
-		const_shader_data_setup()
+	if const_shader_data_setup_callback != nil {
+		const_shader_data_setup_callback()
 	} else {
-		log.warn("const_shader_data_setup callback not defined, skipping")
+		log.error("const_shader_data_setup_callback not defined")
 	}
 
 	// make the vertex buffer
@@ -208,7 +208,7 @@ Draw_Frame :: struct {
 draw_frame: Draw_Frame
 
 const_shader_data: Const_Shader_Data
-const_shader_data_setup: proc()
+const_shader_data_setup_callback: proc()
 
 
 Sprite :: struct {

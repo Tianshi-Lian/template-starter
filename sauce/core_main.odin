@@ -143,9 +143,10 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 
 	_actual_game_state = new(Game_State)
 
+	draw.const_shader_data_setup_callback = const_shader_data_setup
+
 	draw.render_init()
 
-	app_init()
 }
 
 app_ticks: u64
