@@ -10,7 +10,12 @@ But they vary from game-to-game, so this package is for interfacing with the cor
 
 //
 // DRAW
-//
+
+/* note
+We could likely untangle this and make the data required in the renderer just be stuff like blank types.
+But it'd subtract from the ease of calling the high level draw functions, so probs not the best idea...
+We'll see how it pans out with time. This should be good enough.
+*/
 
 Quad_Flags :: enum u8 {
 	// #shared with the shader.glsl definition
