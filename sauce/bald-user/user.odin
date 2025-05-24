@@ -2,20 +2,44 @@ package core_user
 
 /*
 
-These are concepts the core layer relies on.
+These are concepts the core bald layer relies on.
 
 But they vary from game-to-game, so this package is for interfacing with the core.
+
+---
+
+TODO, I wanna yeet this because it's a bit yuckie. Some notes:
+
+We could likely untangle this and make the data required in the renderer just be stuff like blank types.
+But it'd subtract from the ease of calling the high level draw functions, so probs not the best idea...
+
+it would go from:
+
+draw.draw_sprite(..., .shadow_medium, z_layer=.shadow, flags=.flag2)
+
+^ types are known and can be inferred
+
+to:
+
+draw.draw_sprite(..., int(Sprite_Name.shadow_medium), z_layer=int(ZLayer.shadow), flags=u8(Quad_Flags.flag2))
+
+^ unknown, so we'd need to do more typing
+
+...
+
+orrrr, maybe the solution is to just move the draw_sprite into the bald_helpers ??
+that way we have the fast path by default with known types
+
+then the lower level stuff would be unknown types and the renderer can not care...
+
+that would probably be a good fix. will try that in future.
+
+I'll keep this like this for now, since I'm not sure if there's gonna be other types we need in future that have a more tricky workaround needed.
 
 */
 
 //
 // DRAW
-
-/* note
-We could likely untangle this and make the data required in the renderer just be stuff like blank types.
-But it'd subtract from the ease of calling the high level draw functions, so probs not the best idea...
-We'll see how it pans out with time. This should be good enough.
-*/
 
 Quad_Flags :: enum u8 {
 	// #shared with the shader.glsl definition

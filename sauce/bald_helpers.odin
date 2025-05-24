@@ -2,6 +2,8 @@ package main
 
 /*
 
+bald_helpers_v1
+
 These are functions that should (for the most part) be shared across games.
 
 I put them in here so it's easier to update to newer versions and share it across codebases.
