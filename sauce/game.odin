@@ -37,8 +37,6 @@ when NOT_RELEASE {
 // epic state
 //
 
-
-
 Entity :: struct {
 	handle: Entity_Handle,
 	kind: Entity_Kind,
@@ -405,7 +403,11 @@ draw_sprite_entity :: proc(
 
 	col_override := col_override
 
-	
+	col_override = entity.scratch.col_override
+	if entity.hit_flash.a != 0 {
+		col_override.xyz = entity.hit_flash.xyz
+		col_override.a = max(col_override.a, entity.hit_flash.a)
+	}
 
 	draw.draw_sprite(pos, sprite, pivot, flip_x, draw_offset, xform, anim_index, col, col_override, z_layer, flags, params, crop_top, crop_left, crop_bottom, crop_right)
 }
