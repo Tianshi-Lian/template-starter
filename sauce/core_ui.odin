@@ -6,6 +6,7 @@ import "bald:utils"
 import "bald:utils/shape"
 
 import "bald:draw"
+import "bald:input"
 
 import "core:fmt"
 import "core:log"
@@ -64,8 +65,8 @@ screen_pivot :: proc(pivot: Pivot) -> (x, y: f32) {
 raw_button :: proc(rect: Rect) -> (hover, pressed: bool) {
 	mouse_pos := mouse_pos_in_current_space()
 	hover = shape.rect_contains(rect, mouse_pos)
-	if hover && key_pressed(.LEFT_MOUSE) {
-		consume_key_pressed(.LEFT_MOUSE)
+	if hover && input.key_pressed(.LEFT_MOUSE) {
+		input.consume_key_pressed(.LEFT_MOUSE)
 		pressed = true
 	}
 	return

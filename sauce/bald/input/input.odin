@@ -1,106 +1,26 @@
-package main
+package input
 
-//
-// relies on external definitions of:
-// Input_Action enum
-// action_map: map[Input_Action]Key_Code
-//
+/*
 
-import "core:math/linalg"
+Platform independent input package, built on top of Sokol.
+
+Just plug in event_callback in sokol setup and call it a day.
+
+*/
+
 import "core:log"
 
 import sapp "bald:sokol/app"
 
-is_action_pressed :: proc(action: Input_Action) -> bool {
-	return .pressed in ctx.input.keys[key_from_action(action)]
-}
-is_action_released :: proc(action: Input_Action) -> bool {
-	return .released in ctx.input.keys[key_from_action(action)]
-}
-is_action_down :: proc(action: Input_Action) -> bool {
-	return .down in ctx.input.keys[key_from_action(action)]
-}
-
-consume_action_pressed :: proc(action: Input_Action) {
-	ctx.input.keys[key_from_action(action)] -= {.pressed}
-}
-consume_action_released :: proc(action: Input_Action) {
-	ctx.input.keys[key_from_action(action)] -= {.released}
-}
-
-key_from_action :: proc(action: Input_Action) -> Key_Code {
-	key, found := action_map[action]
-	if !found {
-		log.debugf("action %v not bound to any key", action)
-	}
-	return key
-}
-
-//
-// usage examples & helpers
-//
-
-any_key_press_and_consume :: proc() -> bool {
-
-	for &key_flag, key in ctx.input.keys {
-		if key >= int(Key_Code.LEFT_MOUSE) do continue // skip mouse keys
-
-		if .pressed in key_flag {
-			key_flag -= {.pressed} // consume
-			return true
-		}
-	}
-
-	return false
-}
-
-get_input_vector :: proc() -> Vec2 {
-	input: Vec2
-	if is_action_down(.left) do input.x -= 1.0
-	if is_action_down(.right) do input.x += 1.0
-	if is_action_down(.down) do input.y -= 1.0
-	if is_action_down(.up) do input.y += 1.0
-	if input == {} {
-		return {}
-	} else {
-		return linalg.normalize(input)
-	}
-}
-
-//
-// lower level helpers (only really used when we don't care about rebinds)
-//
-
-key_pressed :: proc(code: Key_Code) -> bool {
-	return .pressed in ctx.input.keys[code]
-}
-key_released :: proc(code: Key_Code) -> bool {
-	return .released in ctx.input.keys[code]
-}
-key_down :: proc(code: Key_Code) -> bool {
-	return .down in ctx.input.keys[code]
-}
-key_repeat :: proc(code: Key_Code) -> bool {
-	return .repeat in ctx.input.keys[code]
-}
-
-// consuming keys is a very helpful pattern that simplifies gameplay / UI input a shit ton
-consume_key_pressed :: proc(code: Key_Code) {
-	ctx.input.keys[code] -= { .pressed }
-}
-consume_key_released :: proc(code: Key_Code) {
-	ctx.input.keys[code] -= { .released }
-}
-
-//
-// actual data & low level sokol input
-//
+// points to the input state all high level calls will act upon
+state: ^Input
 
 Input :: struct {
 	keys: [MAX_KEYCODES]bit_set[Input_Flag],
 	mouse_x, mouse_y: f32,
 	scroll_x, scroll_y: f32,
 }
+
 Input_Flag :: enum u8 {
 	down,
 	pressed,
@@ -126,19 +46,61 @@ add_input :: proc(dest: ^Input, src: Input) {
 	}
 }
 
-_input: Input
+key_pressed :: proc(code: Key_Code) -> bool {
+	return .pressed in state.keys[code]
+}
+key_released :: proc(code: Key_Code) -> bool {
+	return .released in state.keys[code]
+}
+key_down :: proc(code: Key_Code) -> bool {
+	return .down in state.keys[code]
+}
+key_repeat :: proc(code: Key_Code) -> bool {
+	return .repeat in state.keys[code]
+}
+
+// consuming keys is a very helpful pattern that simplifies gameplay / UI input a shit ton
+consume_key_pressed :: proc(code: Key_Code) {
+	state.keys[code] -= { .pressed }
+}
+consume_key_released :: proc(code: Key_Code) {
+	state.keys[code] -= { .released }
+}
+
+any_key_press_and_consume :: proc() -> bool {
+
+	for &key_flag, key in state.keys {
+		if key >= int(Key_Code.LEFT_MOUSE) do continue // skip mouse keys
+
+		if .pressed in key_flag {
+			key_flag -= {.pressed} // consume
+			return true
+		}
+	}
+
+	return false
+}
+
+window_resize_callback: proc(width: int, height: int)
+
+_actual_input_state: Input
+
+import "bald:utils/logger"
 
 // takes all the incoming input events
-core_app_event :: proc "c" (event: ^sapp.Event) { // events example: https://floooh.github.io/sokol-html5/events-sapp.html
-	context = our_context
+event_callback :: proc "c" (event: ^sapp.Event) { // events example: https://floooh.github.io/sokol-html5/events-sapp.html
+	context = logger.get_context_for_logging() // only needed because we error down below
 
-	input_state := &_input
+	input_state := &_actual_input_state
 	
 	#partial switch event.type {
 	
 		case .RESIZED:
-		window_w = event.window_width
-		window_h = event.window_height
+		if window_resize_callback == nil {
+			log.error("no window_resize_callback defined for input package")
+		} else {
+			window_resize_callback(int(event.window_width), int(event.window_height))
+		}
 	
 		case .MOUSE_SCROLL:
 		input_state.scroll_x = event.scroll_x
@@ -316,3 +278,7 @@ map_sokol_mouse_button :: proc "c" (sokol_mouse_button: sapp.Mousebutton) -> Key
 	}
 	return nil
 }
+
+Vec2 :: [2]f32
+Vec3 :: [3]f32
+Vec4 :: [4]f32

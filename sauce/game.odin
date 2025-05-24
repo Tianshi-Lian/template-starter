@@ -1,10 +1,10 @@
-#+feature dynamic-literals // needed for the action_map below
 package main
 
 //
 // GAMEPLAY O'CLOCK BAYBEE
 //
 
+import "bald:input"
 import "bald:draw"
 import "bald:sound"
 import "bald:utils"
@@ -37,25 +37,7 @@ when NOT_RELEASE {
 // epic state
 //
 
-action_map: map[Input_Action]Key_Code = {
-	.left = .A,
-	.right = .D,
-	.up = .W,
-	.down = .S,
-	.click = .LEFT_MOUSE,
-	.use = .RIGHT_MOUSE,
-	.interact = .E,
-}
 
-Input_Action :: enum u8 {
-	left,
-	right,
-	up,
-	down,
-	click,
-	use,
-	interact,
-}
 
 Entity :: struct {
 	handle: Entity_Handle,
@@ -192,8 +174,8 @@ game_update :: proc() {
 		}
 	}
 
-	if key_pressed(.LEFT_MOUSE) {
-		consume_key_pressed(.LEFT_MOUSE)
+	if input.key_pressed(.LEFT_MOUSE) {
+		input.consume_key_pressed(.LEFT_MOUSE)
 
 		pos := mouse_pos_in_current_space()
 		log.info("schloop at", pos)
@@ -375,7 +357,7 @@ get_camera_zoom :: proc() -> f32 {
 	return f32(GAME_RES_HEIGHT) / f32(window_h)
 }
 
-// this is reliant on the ctx input mouse pos
+// this is reliant on the input state mouse pos
 mouse_pos_in_current_space :: proc() -> Vec2 {
 	proj := draw.draw_frame.coord_space.proj
 	cam := draw.draw_frame.coord_space.camera
@@ -383,7 +365,7 @@ mouse_pos_in_current_space :: proc() -> Vec2 {
 		log.error("not in a space, need to push_coord_space first")
 	}
 	
-	mouse := Vec2{ctx.input.mouse_x, ctx.input.mouse_y}
+	mouse := Vec2{input.state.mouse_x, input.state.mouse_y}
 
 	ndc_x := (mouse.x / (f32(window_w) * 0.5)) - 1.0;
 	ndc_y := (mouse.y / (f32(window_h) * 0.5)) - 1.0;

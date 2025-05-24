@@ -9,6 +9,13 @@ import "core:fmt"
 import "core:log"
 import "core:strings"
 
+get_context_for_logging :: proc() -> runtime.Context {
+	our_context := runtime.default_context()
+	our_context.logger = logger()
+	our_context.assertion_failure_proc = assertion_failure_proc
+	return our_context
+}
+
 logger :: proc() -> log.Logger {
 	return log.Logger{logger_proc, nil, log.Level.Debug, nil}
 }

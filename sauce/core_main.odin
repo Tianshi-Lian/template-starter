@@ -11,6 +11,7 @@ Pivot :: utils.Pivot
 scale_from_pivot :: utils.scale_from_pivot
 
 import "bald:draw"
+import "bald:input"
 
 import shape "bald:utils/shape"
 Shape :: shape.Shape
@@ -51,8 +52,8 @@ DEMO :: #config(DEMO, false)
 DEV :: #config(DEV, NOT_RELEASE)
 
 // inital params, these are resized in the event callback
-window_w :i32= 1280
-window_h :i32= 720
+window_w := 1280
+window_h := 720
 
 TICKS_PER_SECOND :: 60
 SIM_RATE :: 1.0 / TICKS_PER_SECOND
@@ -80,7 +81,6 @@ Vector2i :: [2]int
 
 Core_Context :: struct {
 	gs: ^Game_State,
-	input: ^Input,
 	delta_t: f32,
 }
 ctx: Core_Context
@@ -101,18 +101,16 @@ push_ctx :: proc() -> Core_Context {
 
 our_context: runtime.Context
 main :: proc() {
-	context = runtime.default_context()
-	context.logger = logger.logger()
-	context.assertion_failure_proc = logger.assertion_failure_proc
-	our_context = context
+	our_context = logger.get_context_for_logging()
+	context = our_context
 
 	sapp.run({
 		init_cb = core_app_init,
 		frame_cb = core_app_frame,
 		cleanup_cb = core_app_shutdown,
-		event_cb = core_app_event,
-		width = window_w,
-		height = window_h,
+		event_cb = input.event_callback,
+		width = i32(window_w),
+		height = i32(window_h),
 		window_title = WINDOW_TITLE,
 		icon = { sokol_default = true },
 		logger = { func = slog.func },
@@ -143,6 +141,11 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 
 	_actual_game_state = new(Game_State)
 
+	input.window_resize_callback = proc(width: int, height: int) {
+		window_w = width
+		window_h = height
+	}
+
 	draw.const_shader_data_setup_callback = const_shader_data_setup
 
 	draw.render_init()
@@ -171,10 +174,12 @@ core_app_frame :: proc "c" () {
 
 	// this is our delta_t for the frame
 	ctx.delta_t = f32(frame_time)
+	// we're just using the underlying game state for now, nothing fancy
 	ctx.gs = _actual_game_state
-	ctx.input = &_input
+	// also just using underlying input state, nothing fancy
+	input.state = &input._actual_input_state
 
-	if key_pressed(.ENTER) && key_down(.LEFT_ALT) {
+	if input.key_pressed(.ENTER) && input.key_down(.LEFT_ALT) {
 		sapp.toggle_fullscreen()
 	}
 
@@ -182,7 +187,7 @@ core_app_frame :: proc "c" () {
 	app_frame()
 	draw.core_render_frame_end()
 
-	reset_input_state(ctx.input)
+	input.reset_input_state(input.state)
 	free_all(context.temp_allocator)
 
 	app_ticks += 1
