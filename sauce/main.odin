@@ -4,11 +4,16 @@ package main
 
 This is the main entrypoint & structure of the frame / update loop.
 
-It doesn't make sense to abstract this away into a package, nor share across projects,
-because it can vary depending on the game that's being made.
+It doesn't make sense to abstract this away into a package,
+because it can vary depending on the game that's being made,
+and is highly tangled with game state.
 
 This is an example of a simple variable timestep update & render, which I've found
 to be a great sweet spot for small to medium sized singleplayer games.
+
+Ideally, things are structured here in a way where you can just swap in a different main file
+that does a different structure, like multiplayer, fixed timestep, etc, and it be kinda fine.
+^ we'll see how this pans out
 
 */
 
@@ -34,7 +39,7 @@ import sg "bald:sokol/gfx"
 import sglue "bald:sokol/glue"
 import slog "bald:sokol/log"
 
-import win32 "core:sys/windows"
+import win32 "core:sys/windows" // wait, how is this building on mac?
 
 //
 // MAIN
