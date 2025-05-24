@@ -54,6 +54,18 @@ Sprite_Name :: user.Sprite_Name
 get_frame_count :: user.get_frame_count
 
 //
+// constant compile-tile flags for target specific logic
+
+// Release or Debug
+GENERATE_DEBUG_SYMBOLS :: ODIN_DEBUG
+RELEASE :: #config(RELEASE, !ODIN_DEBUG) // by default, make it not release on -debug
+NOT_RELEASE :: !RELEASE // called this NOT_RELEASE because we can still be debuggin on release
+
+// these are used right now, will make them useful later on
+DEMO :: #config(DEMO, false)
+DEV :: #config(DEV, NOT_RELEASE)
+
+//
 // game spaces
 
 get_world_space :: proc() -> draw.Coord_Space {

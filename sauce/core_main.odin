@@ -4,8 +4,8 @@ package main
 
 This is the main entrypoint & structure of the frame / update loop.
 
-It doesn't make sense to abstract this away into a package, because it can
-vary depending on the game that's being made.
+It doesn't make sense to abstract this away into a package, nor share across projects,
+because it can vary depending on the game that's being made.
 
 This is an example of a simple variable timestep update & render, which I've found
 to be a great sweet spot for small to medium sized singleplayer games.
@@ -35,25 +35,6 @@ import sglue "bald:sokol/glue"
 import slog "bald:sokol/log"
 
 import win32 "core:sys/windows"
-
-GAME_RES_WIDTH :: 480
-GAME_RES_HEIGHT :: 270
-
-// Release or Debug
-GENERATE_DEBUG_SYMBOLS :: ODIN_DEBUG
-RELEASE :: #config(RELEASE, !ODIN_DEBUG) // by default, make it not release on -debug
-NOT_RELEASE :: !RELEASE // called this NOT_RELEASE because we can still be debuggin on release
-
-// these are used right now, will make them useful later on
-DEMO :: #config(DEMO, false)
-DEV :: #config(DEV, NOT_RELEASE)
-
-// inital params, these are resized in the event callback
-window_w := 1280
-window_h := 720
-
-TICKS_PER_SECOND :: 60
-SIM_RATE :: 1.0 / TICKS_PER_SECOND
 
 //
 // MAIN

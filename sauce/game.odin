@@ -22,6 +22,10 @@ import spall "core:prof/spall"
 
 VERSION :string: "v0.0.0"
 WINDOW_TITLE :: "Template [bald]"
+GAME_RES_WIDTH :: 480
+GAME_RES_HEIGHT :: 270
+window_w := 1280
+window_h := 720
 
 when NOT_RELEASE {
 	// can edit stuff in here to be whatever for testing
