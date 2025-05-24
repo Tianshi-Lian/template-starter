@@ -1,8 +1,16 @@
 package main
 
-//
-// main entrypoint
-//
+/*
+
+This is the main entrypoint & structure of the frame / update loop.
+
+It doesn't make sense to abstract this away into a package, because it can
+vary depending on the game that's being made.
+
+This is an example of a simple variable timestep update & render, which I've found
+to be a great sweet spot for small to medium sized singleplayer games.
+
+*/
 
 import "bald:sound"
 
@@ -155,6 +163,16 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 app_ticks: u64
 frame_time: f64
 last_frame_time: f64
+
+/*
+note on "fixing your timestep": https://gafferongames.com/post/fix_your_timestep/
+
+A fixed update timestep is only needed when it's needed. Not before.
+It adds complexity. So there's no point taking on that complexity cost unless you 100%
+need it to make the game you want to make.
+
+Just using a variable delta_t and constraining it nicely gets you solid bang-for-buck.
+*/
 
 core_app_frame :: proc "c" () {
 	context = our_context

@@ -1,8 +1,14 @@
 package main
 
-//
-// core structure of entity system.
-//
+/*
+
+This is a nice lil cosy spot for the backbone of the entity system.
+
+Entity structure can vary greatly or subtly from game to game depending on the constraints.
+So it doesn't really make sense to abstract this away into a package.
+It adds too much friction.
+
+*/
 
 MAX_ENTITIES :: 2048 // increase this as needed.
 

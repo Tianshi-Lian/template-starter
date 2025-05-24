@@ -71,3 +71,26 @@ raw_button :: proc(rect: Rect) -> (hover, pressed: bool) {
 	}
 	return
 }
+
+mouse_pos_in_current_space :: proc() -> Vec2 {
+	proj := draw.draw_frame.coord_space.proj
+	cam := draw.draw_frame.coord_space.camera
+	if proj == {} || cam == {} {
+		log.error("not in a space, need to push_coord_space first")
+	}
+	
+	mouse := Vec2{input.state.mouse_x, input.state.mouse_y}
+
+	ndc_x := (mouse.x / (f32(window_w) * 0.5)) - 1.0;
+	ndc_y := (mouse.y / (f32(window_h) * 0.5)) - 1.0;
+	ndc_y *= -1
+	
+	mouse_ndc := v2{ndc_x, ndc_y}
+	
+	mouse_world :Vec4= Vec4{mouse_ndc.x, mouse_ndc.y, 0, 1}
+
+	mouse_world = linalg.inverse(proj) * mouse_world
+	mouse_world = cam * mouse_world
+	
+	return mouse_world.xy
+}

@@ -65,6 +65,7 @@ Sprite_Data :: struct {
 	frame_count: int,
 }
 
+// #cleanup todo, this is kinda yuckie living in the bald-user
 get_frame_count :: proc(sprite: Sprite_Name) -> int {
 	frame_count := sprite_data[sprite].frame_count
 	if frame_count == 0 {

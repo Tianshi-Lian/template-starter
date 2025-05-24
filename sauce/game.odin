@@ -106,8 +106,42 @@ entity_setup :: proc(e: ^Entity, kind: Entity_Kind) {
 }
 
 //
-// main game procs
+// game spaces
+
+get_world_space :: proc() -> draw.Coord_Space {
+	return {proj=get_world_space_proj(), camera=get_world_space_camera()}
+}
+get_screen_space :: proc() -> draw.Coord_Space {
+	return {proj=get_screen_space_proj(), camera=Matrix4(1)}
+}
+
+get_world_space_proj :: proc() -> Matrix4 {
+	return linalg.matrix_ortho3d_f32(f32(window_w) * -0.5, f32(window_w) * 0.5, f32(window_h) * -0.5, f32(window_h) * 0.5, -1, 1)
+}
+get_world_space_camera :: proc() -> Matrix4 {
+	cam := Matrix4(1)
+	cam *= utils.xform_translate(ctx.gs.cam_pos)
+	cam *= utils.xform_scale(get_camera_zoom())
+	return cam
+}
+get_camera_zoom :: proc() -> f32 {
+	return f32(GAME_RES_HEIGHT) / f32(window_h)
+}
+
+get_screen_space_proj :: proc() -> Matrix4 {
+	scale := f32(GAME_RES_HEIGHT) / f32(window_h) // same res as standard world zoom
+	
+	w := f32(window_w) * scale
+	h := f32(window_h) * scale
+	
+	// this centers things
+	offset := GAME_RES_WIDTH*0.5 - w*0.5
+
+	return linalg.matrix_ortho3d_f32(0+offset, w+offset, 0, h, -1, 1)
+}
+
 //
+// main game procs
 
 const_shader_data_setup :: proc() {
 	using draw.const_shader_data
@@ -121,7 +155,7 @@ app_frame :: proc() {
 
 	{
 		// ui space example
-		draw.push_coord_space({proj=get_screen_space_proj(), camera=Matrix4(1)})
+		draw.push_coord_space(get_screen_space())
 
 		x, y := screen_pivot(.top_left)
 		x += 2
@@ -151,7 +185,7 @@ game_update :: proc() {
 	}
 
 	// this'll be using the last frame's camera position, but it's fine for most things
-	draw.push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
+	draw.push_coord_space(get_world_space())
 
 	// setup world for first game tick
 	if ctx.gs.ticks == 0 {
@@ -212,7 +246,7 @@ game_draw :: proc() {
 
 	// world
 	{
-		draw.push_coord_space({proj=get_world_space_proj(), camera=get_world_space_camera()})
+		draw.push_coord_space(get_world_space())
 		
 		draw.draw_sprite({10, 10}, .player_still, col_override=v4{1,0,0,0.4})
 		draw.draw_sprite({-10, 10}, .player_still)
@@ -234,6 +268,41 @@ draw_entity_default :: proc(e: Entity) {
 	}
 
 	draw_sprite_entity(&e, e.pos, e.sprite, anim_index=e.anim_index, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=.bottom_center)
+}
+
+// helper for drawing a sprite that's based on an entity.
+// useful for systems-based draw overrides, like having the concept of a hit_flash across all entities
+draw_sprite_entity :: proc(
+	entity: ^Entity,
+
+	pos: Vec2,
+	sprite: user.Sprite_Name,
+	pivot:=utils.Pivot.center_center,
+	flip_x:=false,
+	draw_offset:=Vec2{},
+	xform:=Matrix4(1),
+	anim_index:=0,
+	col:=color.WHITE,
+	col_override:Vec4={},
+	z_layer:user.ZLayer={},
+	flags:user.Quad_Flags={},
+	params:Vec4={},
+	crop_top:f32=0.0,
+	crop_left:f32=0.0,
+	crop_bottom:f32=0.0,
+	crop_right:f32=0.0,
+	z_layer_queue:=-1,
+) {
+
+	col_override := col_override
+
+	col_override = entity.scratch.col_override
+	if entity.hit_flash.a != 0 {
+		col_override.xyz = entity.hit_flash.xyz
+		col_override.a = max(col_override.a, entity.hit_flash.a)
+	}
+
+	draw.draw_sprite(pos, sprite, pivot, flip_x, draw_offset, xform, anim_index, col, col_override, z_layer, flags, params, crop_top, crop_left, crop_bottom, crop_right)
 }
 
 //
@@ -327,87 +396,4 @@ update_entity_animation :: proc(e: ^Entity) {
 			}
 		}
 	}
-}
-
-get_world_space_proj :: proc() -> Matrix4 {
-	return linalg.matrix_ortho3d_f32(f32(window_w) * -0.5, f32(window_w) * 0.5, f32(window_h) * -0.5, f32(window_h) * 0.5, -1, 1)
-}
-get_world_space_camera :: proc() -> Matrix4 {
-	cam := Matrix4(1)
-	cam *= utils.xform_translate(ctx.gs.cam_pos)
-	cam *= utils.xform_scale(get_camera_zoom())
-	return cam
-}
-
-get_screen_space_proj :: proc() -> Matrix4 {
-	scale := f32(GAME_RES_HEIGHT) / f32(window_h) // same res as standard world zoom
-	
-	w := f32(window_w) * scale
-	h := f32(window_h) * scale
-	
-	// this centers things
-	offset := GAME_RES_WIDTH*0.5 - w*0.5
-
-	return linalg.matrix_ortho3d_f32(0+offset, w+offset, 0, h, -1, 1)
-}
-
-get_camera_zoom :: proc() -> f32 {
-	return f32(GAME_RES_HEIGHT) / f32(window_h)
-}
-
-// this is reliant on the input state mouse pos
-mouse_pos_in_current_space :: proc() -> Vec2 {
-	proj := draw.draw_frame.coord_space.proj
-	cam := draw.draw_frame.coord_space.camera
-	if proj == {} || cam == {} {
-		log.error("not in a space, need to push_coord_space first")
-	}
-	
-	mouse := Vec2{input.state.mouse_x, input.state.mouse_y}
-
-	ndc_x := (mouse.x / (f32(window_w) * 0.5)) - 1.0;
-	ndc_y := (mouse.y / (f32(window_h) * 0.5)) - 1.0;
-	ndc_y *= -1
-	
-	mouse_ndc := v2{ndc_x, ndc_y}
-	
-	mouse_world :Vec4= Vec4{mouse_ndc.x, mouse_ndc.y, 0, 1}
-
-	mouse_world = linalg.inverse(proj) * mouse_world
-	mouse_world = cam * mouse_world
-	
-	return mouse_world.xy
-}
-
-draw_sprite_entity :: proc(
-	entity: ^Entity,
-
-	pos: Vec2,
-	sprite: user.Sprite_Name,
-	pivot:=utils.Pivot.center_center,
-	flip_x:=false,
-	draw_offset:=Vec2{},
-	xform:=Matrix4(1),
-	anim_index:=0,
-	col:=color.WHITE,
-	col_override:Vec4={},
-	z_layer:user.ZLayer={},
-	flags:user.Quad_Flags={},
-	params:Vec4={},
-	crop_top:f32=0.0,
-	crop_left:f32=0.0,
-	crop_bottom:f32=0.0,
-	crop_right:f32=0.0,
-	z_layer_queue:=-1,
-) {
-
-	col_override := col_override
-
-	col_override = entity.scratch.col_override
-	if entity.hit_flash.a != 0 {
-		col_override.xyz = entity.hit_flash.xyz
-		col_override.a = max(col_override.a, entity.hit_flash.a)
-	}
-
-	draw.draw_sprite(pos, sprite, pivot, flip_x, draw_offset, xform, anim_index, col, col_override, z_layer, flags, params, crop_top, crop_left, crop_bottom, crop_right)
 }
