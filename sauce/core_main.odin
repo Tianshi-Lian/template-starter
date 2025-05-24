@@ -13,21 +13,10 @@ to be a great sweet spot for small to medium sized singleplayer games.
 */
 
 import "bald:sound"
-
 import "bald:utils"
-Pivot :: utils.Pivot
-scale_from_pivot :: utils.scale_from_pivot
-
 import "bald:draw"
 import "bald:input"
-
-import shape "bald:utils/shape"
-Shape :: shape.Shape
-Rect :: shape.Rect
-Circle :: shape.Circle
-rect_make :: shape.rect_make
-rect_size :: shape.rect_size
-
+import "bald:utils/shape"
 import "bald:utils/logger"
 
 import "core:sync"
@@ -66,46 +55,8 @@ window_h := 720
 TICKS_PER_SECOND :: 60
 SIM_RATE :: 1.0 / TICKS_PER_SECOND
 
-// shorthand definitions
-Vector2 :: [2]f32
-Vector3 :: [3]f32
-Vector4 :: [4]f32
-v2 :: Vector2
-v3 :: Vector3
-v4 :: Vector4
-Vec2 :: v2
-Vec3 :: v4
-Vec4 :: v4
-Matrix4 :: linalg.Matrix4f32;
-Vector2i :: [2]int
-
-//
-// custom global context
-//
-
-// this is basically just Odin's context, but our own so it's easy to
-// access global data deep in the callstack.
-// (it'll also help later on with more complicated games)
-
-Core_Context :: struct {
-	gs: ^Game_State,
-	delta_t: f32,
-}
-ctx: Core_Context
-
-// useful for doing a push_ctx and setting values for a scope
-// and having it auto-pop to the original once the scope ends
-set_ctx :: proc(_ctx: Core_Context) {
-	ctx = _ctx
-}
-@(deferred_out=set_ctx)
-push_ctx :: proc() -> Core_Context {
-	return ctx
-}
-
 //
 // MAIN
-//
 
 our_context: runtime.Context
 main :: proc() {
@@ -126,7 +77,7 @@ main :: proc() {
 }
 
 // don't directly access this global, use the ctx.gs instead.
-// (this will help later when you upgrade to a fixed timestep, don't worry about it now tho)
+// (getting used to this will help later when you upgrade to a fixed timestep, don't worry about it now tho)
 _actual_game_state: ^Game_State
 
 core_app_init :: proc "c" () { // these sokol callbacks are c procs
@@ -157,12 +108,7 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 	draw.const_shader_data_setup_callback = const_shader_data_setup
 
 	draw.render_init()
-
 }
-
-app_ticks: u64
-frame_time: f64
-last_frame_time: f64
 
 /*
 note on "fixing your timestep": https://gafferongames.com/post/fix_your_timestep/
@@ -173,6 +119,10 @@ need it to make the game you want to make.
 
 Just using a variable delta_t and constraining it nicely gets you solid bang-for-buck.
 */
+
+app_ticks: u64
+frame_time: f64
+last_frame_time: f64
 
 core_app_frame :: proc "c" () {
 	context = our_context
@@ -216,19 +166,4 @@ core_app_shutdown :: proc "c" () {
 
 	app_shutdown()
 	sg.shutdown()
-}
-
-app_now :: utils.seconds_since_init
-
-now :: proc() -> f64 {
-	return ctx.gs.game_time_elapsed
-}
-end_time_up :: proc(end_time: f64) -> bool {
-	return end_time == -1 ? false : now() >= end_time 
-}
-time_since :: proc(time: f64) -> f32 {
-	if time == 0 {
-		return 99999999.0
-	}
-	return f32(now()-time)
 }

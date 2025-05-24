@@ -1,3 +1,4 @@
+#+feature dynamic-literals
 package main
 
 //
@@ -9,9 +10,6 @@ import "bald:draw"
 import "bald:sound"
 import "bald:utils"
 import "bald:utils/color"
-
-import user "user:bald-user"
-Sprite_Name :: user.Sprite_Name
 
 import "core:log"
 import "core:fmt"
@@ -84,7 +82,28 @@ Game_State :: struct {
 	}
 }
 
+//
+// action -> key mapping
 
+action_map: map[Input_Action]input.Key_Code = {
+	.left = .A,
+	.right = .D,
+	.up = .W,
+	.down = .S,
+	.click = .LEFT_MOUSE,
+	.use = .RIGHT_MOUSE,
+	.interact = .E,
+}
+
+Input_Action :: enum u8 {
+	left,
+	right,
+	up,
+	down,
+	click,
+	use,
+	interact,
+}
 
 
 Entity_Kind :: enum {
@@ -103,41 +122,6 @@ entity_setup :: proc(e: ^Entity, kind: Entity_Kind) {
 		case .player: setup_player(e)
 		case .thing1: setup_thing1(e)
 	}
-}
-
-//
-// game spaces
-
-get_world_space :: proc() -> draw.Coord_Space {
-	return {proj=get_world_space_proj(), camera=get_world_space_camera()}
-}
-get_screen_space :: proc() -> draw.Coord_Space {
-	return {proj=get_screen_space_proj(), camera=Matrix4(1)}
-}
-
-get_world_space_proj :: proc() -> Matrix4 {
-	return linalg.matrix_ortho3d_f32(f32(window_w) * -0.5, f32(window_w) * 0.5, f32(window_h) * -0.5, f32(window_h) * 0.5, -1, 1)
-}
-get_world_space_camera :: proc() -> Matrix4 {
-	cam := Matrix4(1)
-	cam *= utils.xform_translate(ctx.gs.cam_pos)
-	cam *= utils.xform_scale(get_camera_zoom())
-	return cam
-}
-get_camera_zoom :: proc() -> f32 {
-	return f32(GAME_RES_HEIGHT) / f32(window_h)
-}
-
-get_screen_space_proj :: proc() -> Matrix4 {
-	scale := f32(GAME_RES_HEIGHT) / f32(window_h) // same res as standard world zoom
-	
-	w := f32(window_w) * scale
-	h := f32(window_h) * scale
-	
-	// this centers things
-	offset := GAME_RES_WIDTH*0.5 - w*0.5
-
-	return linalg.matrix_ortho3d_f32(0+offset, w+offset, 0, h, -1, 1)
 }
 
 //
@@ -248,7 +232,7 @@ game_draw :: proc() {
 	{
 		draw.push_coord_space(get_world_space())
 		
-		draw.draw_sprite({10, 10}, .player_still, col_override=v4{1,0,0,0.4})
+		draw.draw_sprite({10, 10}, .player_still, col_override=Vec4{1,0,0,0.4})
 		draw.draw_sprite({-10, 10}, .player_still)
 
 		draw.draw_text({0, -50}, "sugon", pivot=.bottom_center, col={0,0,0,0.1})
@@ -258,51 +242,6 @@ game_draw :: proc() {
 			e.draw_proc(e^)
 		}
 	}
-}
-
-draw_entity_default :: proc(e: Entity) {
-	e := e // need this bc we can't take a reference from a procedure parameter directly
-
-	if e.sprite == nil {
-		return
-	}
-
-	draw_sprite_entity(&e, e.pos, e.sprite, anim_index=e.anim_index, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=.bottom_center)
-}
-
-// helper for drawing a sprite that's based on an entity.
-// useful for systems-based draw overrides, like having the concept of a hit_flash across all entities
-draw_sprite_entity :: proc(
-	entity: ^Entity,
-
-	pos: Vec2,
-	sprite: user.Sprite_Name,
-	pivot:=utils.Pivot.center_center,
-	flip_x:=false,
-	draw_offset:=Vec2{},
-	xform:=Matrix4(1),
-	anim_index:=0,
-	col:=color.WHITE,
-	col_override:Vec4={},
-	z_layer:user.ZLayer={},
-	flags:user.Quad_Flags={},
-	params:Vec4={},
-	crop_top:f32=0.0,
-	crop_left:f32=0.0,
-	crop_bottom:f32=0.0,
-	crop_right:f32=0.0,
-	z_layer_queue:=-1,
-) {
-
-	col_override := col_override
-
-	col_override = entity.scratch.col_override
-	if entity.hit_flash.a != 0 {
-		col_override.xyz = entity.hit_flash.xyz
-		col_override.a = max(col_override.a, entity.hit_flash.a)
-	}
-
-	draw.draw_sprite(pos, sprite, pivot, flip_x, draw_offset, xform, anim_index, col, col_override, z_layer, flags, params, crop_top, crop_left, crop_bottom, crop_right)
 }
 
 //
@@ -345,7 +284,7 @@ setup_player :: proc(e: ^Entity) {
 			entity_set_animation(e, .player_run, 0.1)
 		}
 
-		e.scratch.col_override = v4{0,0,1,0.2}
+		e.scratch.col_override = Vec4{0,0,1,0.2}
 	}
 
 	e.draw_proc = proc(e: Entity) {
@@ -370,7 +309,7 @@ entity_set_animation :: proc(e: ^Entity, sprite: Sprite_Name, frame_duration: f3
 update_entity_animation :: proc(e: ^Entity) {
 	if e.frame_duration == 0 do return
 
-	frame_count := user.get_frame_count(e.sprite)
+	frame_count := get_frame_count(e.sprite)
 
 	is_playing := true
 	if !e.loop {
