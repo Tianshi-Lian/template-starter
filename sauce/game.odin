@@ -143,6 +143,10 @@ const_shader_data_setup :: proc() {
 	bg_repeat_tex0_atlas_uv = draw.atlas_uv_from_sprite(.bg_repeat_tex0)
 }
 
+app_init :: proc() {
+	
+}
+
 app_frame :: proc() {
 
 	// right now we are just calling the game update, but in future this is where you'd do a big
