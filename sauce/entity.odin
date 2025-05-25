@@ -13,8 +13,8 @@ It adds too much friction.
 MAX_ENTITIES :: 2048 // increase this as needed.
 
 import "base:runtime"
-import "core:log"
 import "core:fmt"
+import "core:log"
 
 Entity_Handle :: struct {
 	index: int,
@@ -22,7 +22,7 @@ Entity_Handle :: struct {
 	// I prefer assigning a unique ID to each entity, instead of going the generational
 	// handle route. Makes trying to debug things a bit easier if we know for a fact
 	// an entity cannot have the same ID as another one.
-	id: int,
+	id:    int,
 }
 
 zero_entity: Entity // #readonlytodo
@@ -47,7 +47,7 @@ entity_init_core :: proc() {
 	entity_setup(&zero_entity, .nil)
 }
 
-entity_from_handle :: proc(handle: Entity_Handle) -> (entity: ^Entity, ok:bool) #optional_ok {
+entity_from_handle :: proc(handle: Entity_Handle) -> (entity: ^Entity, ok: bool) #optional_ok {
 	if handle.index <= 0 || handle.index > ctx.gs.entity_top_count {
 		return &zero_entity, false
 	}
@@ -62,13 +62,13 @@ entity_from_handle :: proc(handle: Entity_Handle) -> (entity: ^Entity, ok:bool) 
 
 entity_create :: proc(kind: Entity_Kind) -> ^Entity {
 
-	index:= -1
+	index := -1
 	if len(ctx.gs.entity_free_list) > 0 {
 		index = pop(&ctx.gs.entity_free_list)
 	}
 
 	if index == -1 {
-		assert(ctx.gs.entity_top_count+1 < MAX_ENTITIES, "ran out of entities, increase size")
+		assert(ctx.gs.entity_top_count + 1 < MAX_ENTITIES, "ran out of entities, increase size")
 		ctx.gs.entity_top_count += 1
 		index = ctx.gs.entity_top_count
 	}
