@@ -142,6 +142,10 @@ make_directory_if_not_exist :: proc(path: string) {
 	}
 }
 
+pct_chance :: proc(pct: f32) -> bool {
+	return rand.float32() < pct
+}
+
 random_sign :: proc() -> f32 {
 	return rand.int_max(2) == 0 ? 1.0 : -1.0
 }
