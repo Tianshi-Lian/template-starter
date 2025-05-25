@@ -52,6 +52,7 @@ Pivot :: utils.Pivot
 scale_from_pivot :: utils.scale_from_pivot // #cleanup, remove this
 
 // bald user stuff
+ZLayer :: user.ZLayer
 Quad_Flags :: user.Quad_Flags
 Sprite_Name :: user.Sprite_Name
 get_frame_count :: user.get_frame_count
