@@ -139,11 +139,6 @@ entity_setup :: proc(e: ^Entity, kind: Entity_Kind) {
 //
 // main game procs
 
-const_shader_data_setup :: proc() {
-	using draw.const_shader_data
-	bg_repeat_tex0_atlas_uv = draw.atlas_uv_from_sprite(.bg_repeat_tex0)
-}
-
 app_init :: proc() {
 
 }
@@ -234,6 +229,7 @@ game_draw :: proc() {
 
 	// this is so we can get the current pixel in the shader in world space (VERYYY useful)
 	draw.draw_frame.ndc_to_world_xform = get_world_space_camera() * linalg.inverse(get_world_space_proj())
+	draw.draw_frame.bg_repeat_tex0_atlas_uv = draw.atlas_uv_from_sprite(.bg_repeat_tex0)
 
 	// background thing
 	{

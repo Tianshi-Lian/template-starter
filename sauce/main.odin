@@ -94,8 +94,6 @@ core_app_init :: proc "c" () { // these sokol callbacks are c procs
 		window_h = height
 	}
 
-	draw.const_shader_data_setup_callback = const_shader_data_setup
-
 	draw.render_init()
 
 	app_init()

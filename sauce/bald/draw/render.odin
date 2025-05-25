@@ -68,11 +68,6 @@ render_init :: proc() {
 
 	load_sprites_into_atlas()
 	load_font()
-	if const_shader_data_setup_callback != nil {
-		const_shader_data_setup_callback()
-	} else {
-		log.error("const_shader_data_setup_callback not defined")
-	}
 
 	// make the vertex buffer
 	render_state.bind.vertex_buffers[0] = sg.make_buffer({
@@ -174,8 +169,7 @@ core_render_frame_end :: proc() {
 		sg.begin_pass({ action = render_state.pass_action, swapchain = sglue.swapchain() })
 		sg.apply_pipeline(render_state.pip)
 		sg.apply_bindings(render_state.bind)
-		sg.apply_uniforms(UB_CBuff, {ptr=&draw_frame.cbuff, size=size_of(Cbuff)})
-		sg.apply_uniforms(UB_Const_Shader_Data, {ptr=&const_shader_data, size=size_of(Const_Shader_Data)})
+		sg.apply_uniforms(UB_Shader_Data, {ptr=&draw_frame.shader_data, size=size_of(Shader_Data)})
 		sg.draw(0, 6*total_quad_count, 1)
 		sg.end_pass()
 	}
@@ -201,15 +195,11 @@ Draw_Frame :: struct {
 		active_z_layer: user.ZLayer,
 		active_scissor: shape.Rect,
 		active_flags: user.Quad_Flags,
-		using cbuff: Cbuff,
+		using shader_data: Shader_Data,
 	}
 
 }
 draw_frame: Draw_Frame
-
-const_shader_data: Const_Shader_Data
-const_shader_data_setup_callback: proc()
-
 
 Sprite :: struct {
 	width, height: i32,
