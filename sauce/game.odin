@@ -1,9 +1,15 @@
 #+feature dynamic-literals
 package main
 
-//
-// GAMEPLAY O'CLOCK BAYBEE
-//
+/*
+
+This is the file where you actually make the game.
+
+It will grow pretty phat. This is where the magic happens.
+
+GAMEPLAY O'CLOCK !
+
+*/
 
 import "bald:input"
 import "bald:draw"
@@ -36,36 +42,7 @@ when NOT_RELEASE {
 }
 
 //
-// epic state
-//
-
-Entity :: struct {
-	handle: Entity_Handle,
-	kind: Entity_Kind,
-
-	// todo, move this into static entity data
-	update_proc: proc(^Entity),
-	draw_proc: proc(Entity),
-
-	// big sloppy entity state dump.
-	// add whatever you need in here.
-	pos: Vec2,
-	last_known_x_dir: f32,
-	flip_x: bool,
-	draw_offset: Vec2,
-	draw_pivot: Pivot,
-	hit_flash: Vec4,
-	sprite: Sprite_Name,
-	anim_index: int,
-  next_frame_end_time: f64,
-  loop: bool,
-  frame_duration: f32,
-	
-	// this gets zeroed every frame. Useful for passing data to other systems.
-	scratch: struct {
-		col_override: Vec4,
-	}
-}
+// epic game state
 
 Game_State :: struct {
 	ticks: u64,
@@ -109,6 +86,36 @@ Input_Action :: enum u8 {
 	interact,
 }
 
+//
+// entity system
+
+Entity :: struct {
+	handle: Entity_Handle,
+	kind: Entity_Kind,
+
+	// todo, move this into static entity data
+	update_proc: proc(^Entity),
+	draw_proc: proc(Entity),
+
+	// big sloppy entity state dump.
+	// add whatever you need in here.
+	pos: Vec2,
+	last_known_x_dir: f32,
+	flip_x: bool,
+	draw_offset: Vec2,
+	draw_pivot: Pivot,
+	hit_flash: Vec4,
+	sprite: Sprite_Name,
+	anim_index: int,
+  next_frame_end_time: f64,
+  loop: bool,
+  frame_duration: f32,
+	
+	// this gets zeroed every frame. Useful for passing data to other systems.
+	scratch: struct {
+		col_override: Vec4,
+	}
+}
 
 Entity_Kind :: enum {
 	nil,
