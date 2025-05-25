@@ -75,6 +75,10 @@ circle_shift :: proc(circle: Circle, amount: Vector2) -> Circle {
 }
 
 shift :: proc(s: Shape, amount: Vector2) -> Shape {
+	if s == {} || amount == {} {
+		return s
+	}
+
   switch shape in s {
     case Rect: return rect_shift(shape, amount)
     case Circle: return circle_shift(shape, amount)

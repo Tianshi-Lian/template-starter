@@ -5,6 +5,10 @@ import "core:math"
 import "core:math/linalg"
 
 collide :: proc(a, b: Shape) -> (colliding: bool, depth: Vector2) {
+	if a == {} || b == {} {
+		return false, 0.0
+	}
+
 	switch a_shape in a {
 
 		case Rect:
