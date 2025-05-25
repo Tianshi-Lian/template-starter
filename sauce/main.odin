@@ -2,11 +2,9 @@ package main
 
 /*
 
-This is the main entrypoint & structure of the frame / update loop.
+variable_main_loop_v1
 
-It doesn't make sense to abstract this away into a package,
-because it can vary depending on the game that's being made,
-and is highly tangled with game state.
+This is the main entrypoint & structure of the frame / update loop.
 
 This is an example of a simple variable timestep update & render, which I've found
 to be a great sweet spot for small to medium sized singleplayer games.
@@ -14,6 +12,11 @@ to be a great sweet spot for small to medium sized singleplayer games.
 Ideally, things are structured here in a way where you can just swap in a different main file
 that does a different structure, like multiplayer, fixed timestep, etc, and it be kinda fine.
 ^ we'll see how this pans out
+
+note:
+It doesn't make sense to abstract this away into a package,
+because it can vary depending on the game that's being made,
+and is highly tangled with game state.
 
 */
 
