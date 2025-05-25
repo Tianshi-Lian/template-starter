@@ -159,7 +159,9 @@ draw_entity_default :: proc(e: Entity) {
 		return
 	}
 
-	draw_sprite_entity(&e, e.pos, e.sprite, anim_index=e.anim_index, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=.bottom_center)
+	xform := utils.xform_rotate(e.rotation)
+
+	draw_sprite_entity(&e, e.pos, e.sprite, xform=xform, anim_index=e.anim_index, draw_offset=e.draw_offset, flip_x=e.flip_x, pivot=e.draw_pivot)
 }
 
 // helper for drawing a sprite that's based on an entity.
