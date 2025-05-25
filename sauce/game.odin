@@ -104,6 +104,7 @@ Entity :: struct {
 	flip_x: bool,
 	draw_offset: Vec2,
 	draw_pivot: Pivot,
+	rotation: f32,
 	hit_flash: Vec4,
 	sprite: Sprite_Name,
 	anim_index: int,
@@ -144,7 +145,7 @@ const_shader_data_setup :: proc() {
 }
 
 app_init :: proc() {
-	
+
 }
 
 app_frame :: proc() {
