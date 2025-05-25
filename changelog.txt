@@ -31,16 +31,19 @@ Added any_key_press_and_consume
 Added mouse_pos_in_current_space 
 raw_button helper for ui button stuff
 
-
-
-+put renderer in a package
-
+--- v0.8
+Massive overhaul of template to be more friendly for future updates.
+Moved most of the core stuff into the /bald package collection
+Moved core_render into the /draw package
+Moved core_input into the /input package
+Added bald_helpers file for a single upgrade point for all helper functions
 
 --- TODO :next
 
 
-put input into a package
+put build into /bald ???
 
+make shader more abstract so it's easier to update
 
 
 maybe rethink how the get world space function works?
